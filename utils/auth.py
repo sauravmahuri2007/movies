@@ -27,6 +27,7 @@ def get_token(request):
     payload = {
         'username': username,
         'password': password,
+        'permissions': movieconf.MOVIE_USERS.get(username, {}).get('permissions', []),
         'iat': current_dtm,
         'exp': current_dtm + timedelta(seconds=movieconf.JWT_EXPIRY_TIME),
     }
@@ -71,8 +72,8 @@ class BasicAuthMixin(View):
                     username, password = decoded_token.decode('utf-8').split(':')
                 else:
                     username, password = decoded_token.split(':')
-            if username == movieconf.MOVIE_BASIC_AUTH['username'] and \
-                            get_hash(password) == movieconf.MOVIE_BASIC_AUTH['password']:
+            if username in movieconf.MOVIE_USERS.keys() and \
+                            get_hash(password) == movieconf.MOVIE_USERS[username]['password']:
                 return username, password
             raise BasicAuthException('Invalid Credentials', 403)
         except (ValueError, TypeError, IndexError):  # Error decoding the token using base64
@@ -121,9 +122,9 @@ class JWTAuthMixin(View):
                 raise JWTAuthException('No JSONWebToken Provided', 401)
             payload = jwt.decode(token, movieconf.JWT_SECRET, algorithms=movieconf.JWT_ALGORITHM)
             username, password = payload.get('username'), payload.get('password')
-            if username == movieconf.MOVIE_BASIC_AUTH['username'] and \
-                            get_hash(password) == movieconf.MOVIE_BASIC_AUTH['password']:
-                return username, password
+            if username in movieconf.MOVIE_USERS.keys() and \
+                            get_hash(password) == movieconf.MOVIE_USERS[username]['password']:
+                return username, payload
             raise JWTAuthException('Invalid JSONWebToken Credentials', 403)
         except IndexError:
             raise JWTAuthException('Empty JSONWebToken Provided', 403)
@@ -136,7 +137,7 @@ class JWTAuthMixin(View):
     def dispatch(self, request, *args, **kwargs):
         try:
             if getattr(request, 'username', None) != movieconf.GUEST_USER:
-                request.username, request.password = self.jwt_authenticate(request)
+                request.username, request.payload = self.jwt_authenticate(request)
         except JWTAuthException as err:
             response = JsonResponse({
                 'status': err.status_code,

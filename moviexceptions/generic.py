@@ -45,3 +45,21 @@ class MovieAlreadyExists(Exception):
 
         def __str__(self):
             return '< %s - %s >' % (self.status_code, self.message)
+
+
+class APIAuthorizationException(Exception):
+    """
+    Raise this exception when the API is not authorized to access due to permissions issues.
+    This is how you'll raise this exception:
+    raise APIAuthorizationException('"url" API with request method "POST" is unauthorized', 403)
+    """
+
+    def __init__(self, *details):
+        self.message = details and details[0] or 'Request Forbidden'
+        try:
+            self.status_code = details and details[1] or 403
+        except IndexError:
+            self.status_code = 403
+
+        def __str__(self):
+            return '< %s - %s >' % (self.status_code, self.message)

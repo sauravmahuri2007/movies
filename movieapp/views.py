@@ -7,6 +7,7 @@ from django.views.generic import View
 from .apps import MovieApp
 from utils.movieutils import add_movie, get_request_body
 from utils.auth import JWTAuthMixin, AllowGETMixin
+from utils.authorization import APIAuthorizationMixin
 from moviexceptions.generic import MovieAlreadyExists
 
 
@@ -31,7 +32,7 @@ class SearchAPI(View):
         return JsonResponse('Not yet implemented!', status=200, safe=False)
 
 
-class MovieAPI(AllowGETMixin, JWTAuthMixin, View):
+class MovieAPI(AllowGETMixin, JWTAuthMixin, APIAuthorizationMixin, View):
     """
     RESTFul implementation of adding/editing/deleting/getting movies from the DB in JSON format.
     AllowGETMixin: Include this mixin when GET method doesn't require any kind of authentication.

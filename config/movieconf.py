@@ -5,9 +5,28 @@ Configuration file for movie.
 Please make sure that all config variables should be declared here.
 """
 
-MOVIE_BASIC_AUTH = {
-    'username': 'MOVIE_U$ER',
-    'password': '0f196474b35837546b9012702705af5ed22a0ab9'  # This is a SHA1 hashed password for security reasons
+# Make sure to give the password as SHA1 hashed.
+# To generate a SHA1 hash password, refer get_hash() function in utils.movieutils.
+MOVIE_USERS = {
+    'admin': {
+        'password': 'fda3bd2f7686a850c37f91c5f8e28e16e702407f',
+        'permissions': ['view_movie', 'add_movie', 'delete_movie', 'update_movie']
+    },
+    'associate': {
+        'password': '13be887b57481d3e4d0c20b879ff95c5cb976e2c',
+        'permissions': ['view_movie', 'update_movie']
+    },
+}
+
+# Make sure to give only the URL name as the key here:
+# For example name='movie'. Check movieapp.urls.py for the name of the URLs
+URL_PERMISSIONS = {
+    'movie': {
+        'GET': ['view_movie'],  # i,e Movie's GET API requires 'view_movie' permission
+        'POST': ['add_movie'],  # similarly, POST API to add a movie requires 'add_movie' permission
+        'PATCH': ['update_movie'],
+        'DELETE': ['delete_movie'],
+    },
 }
 
 JWT_EXPIRY_TIME = 60 * 60 * 24  # 24 Hours in seconds
