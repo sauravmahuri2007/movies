@@ -5,7 +5,7 @@ A Django Pluggable Web App for Managing and Searching Movies like IMDB.
 
 ### 1. Install global dependencies
 
-     sudo apt-get install virtualenv python-pip git mysql-server python3-dev
+     sudo apt-get install virtualenv python-pip git mysql-server python3-dev gunicorn
 
 ### 2. Upgrade `pip` and `setuptools` that are bundled with the OS to the latest stable versions.
 
@@ -27,7 +27,7 @@ A Django Pluggable Web App for Managing and Searching Movies like IMDB.
 
     pip install -r requirements.txt
     
-### 5. Creating the DB and setting up the tables my running the migrations
+### 5. Creating DB and setting up the tables my running the migrations
 
   1. Login to the preferred DBMS used for this application and create DB `movdb`
   For example, to create DB in mysql after login to console:
@@ -37,8 +37,11 @@ A Django Pluggable Web App for Managing and Searching Movies like IMDB.
   2. Setting up the tables for movies:
     
     python manage.py migrate
-    
-    
+
+  3. Creating superuser
+
+    python manage.py createsuperuser
+
 
 ### 6. Run the app using the default lightweight Django web server (until this app is not part of a big application)
 
