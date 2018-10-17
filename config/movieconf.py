@@ -31,12 +31,15 @@ URL_PERMISSIONS = {
 
 API_VALIDATION_RULES = {
     'movie': {
-        'DELETE': {
-            'movieid': ['required', 'integer'], # Make sure there exists a staticmethod
+        'GET': {
+            'movieid': ['required', 'integer'],  # Make sure there exists a staticmethod
             # for given validation in Validators class. Check Validators class in utils.validation
         },
+        'DELETE': {
+            'movieid': ['required', 'integer'],
+        },
         'POST': {
-            'name': ['required', 'string'],
+            'title': ['required', 'string'],
             'director': ['required', 'string'],
         },
         'PATCH': {

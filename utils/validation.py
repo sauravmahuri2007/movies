@@ -17,14 +17,16 @@ class Validators(object):
     """
 
     @staticmethod
-    def required(req_body, field):
+    def required(req_body, field, *args, **kwargs):
         if field not in req_body.keys():
-            return '`{0}` field is required'.format(field)
+            # check if the field is available in kwargs
+            if field not in kwargs.keys():
+                return '`{0}` field is required'.format(field)
         return None
 
     @staticmethod
-    def integer(req_body, field):
-        value = req_body.get(field)
+    def integer(req_body, field, *args, **kwargs):
+        value = req_body.get(field) or kwargs.get(field)
         try:
             value = int(value)
         except TypeError:
@@ -32,8 +34,8 @@ class Validators(object):
         return None
 
     @staticmethod
-    def string(req_body, field):
-        value = req_body.get(field)
+    def string(req_body, field, *args, **kwargs):
+        value = req_body.get(field) or kwargs.get(field)
         if not isinstance(value, str):
             return '`{0}` field must be a string type'.format(field)
         return None
@@ -45,7 +47,7 @@ class RequestValidationMixin(View):
     For the APIs (URL), their method and the permissions refer URL_PERMISSIONS in config.movieconf.py file
     """
 
-    def request_validate(self, request):
+    def request_validate(self, request, *args, **kwargs):
         """
         Validates for each request body and the method as per the request validation config map
         :param request: HTTP Request object
@@ -61,7 +63,7 @@ class RequestValidationMixin(View):
         for field, rules in api_map.items():
             for rule in rules:
                 # Getting the method from Validators class and calling it with the value to validate
-                validation_error = getattr(Validators, rule)(req_body, field)
+                validation_error = getattr(Validators, rule)(req_body, field, *args, **kwargs)
                 if validation_error:
                     errors.append(validation_error.format(field))
         if len(errors) > 0:
@@ -70,7 +72,7 @@ class RequestValidationMixin(View):
 
     def dispatch(self, request, *args, **kwargs):
         try:
-            self.request_validate(request)
+            self.request_validate(request, *args, **kwargs)
         except RequestValidationException as err:
             response = {
                 'status': err.status_code,
