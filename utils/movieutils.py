@@ -4,6 +4,7 @@
 General Movies Utilities, Functions and Helper Functions.
 """
 
+import hashlib
 import json
 
 from django.db import transaction
@@ -99,3 +100,13 @@ def get_request_body(request):
             # Supporting Python3: everything is bytes even request.body.
             body = json.loads(request.body.decode('utf-8'))
     return body
+
+
+def get_hash(string):
+    """
+    Just returns the SHA1 hash of the string. Usually used to do the password match
+    :param string: any string. Usually the password string
+    :return: hash of the string
+    """
+    byte_string = string.encode('utf-8')
+    return hashlib.sha1(byte_string).hexdigest()

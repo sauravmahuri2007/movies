@@ -7,7 +7,7 @@ Please make sure that all config variables should be declared here.
 
 MOVIE_BASIC_AUTH = {
     'username': 'MOVIE_U$ER',
-    'password': 'MOVIE_Pa$$worD'
+    'password': '0f196474b35837546b9012702705af5ed22a0ab9'  # This is a SHA1 hashed password for security reasons
 }
 
 JWT_EXPIRY_TIME = 60 * 60 * 24  # 24 Hours in seconds

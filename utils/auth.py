@@ -18,6 +18,7 @@ from django.views.generic import View
 
 from moviexceptions.generic import BasicAuthException, JWTAuthException
 from config import movieconf
+from .movieutils import get_hash
 
 
 def get_token(request):
@@ -70,7 +71,8 @@ class BasicAuthMixin(View):
                     username, password = decoded_token.decode('utf-8').split(':')
                 else:
                     username, password = decoded_token.split(':')
-            if username == movieconf.MOVIE_BASIC_AUTH['username'] and password == movieconf.MOVIE_BASIC_AUTH['password']:
+            if username == movieconf.MOVIE_BASIC_AUTH['username'] and \
+                            get_hash(password) == movieconf.MOVIE_BASIC_AUTH['password']:
                 return username, password
             raise BasicAuthException('Invalid Credentials', 403)
         except (ValueError, TypeError, IndexError):  # Error decoding the token using base64
@@ -119,7 +121,8 @@ class JWTAuthMixin(View):
                 raise JWTAuthException('No JSONWebToken Provided', 401)
             payload = jwt.decode(token, movieconf.JWT_SECRET, algorithms=movieconf.JWT_ALGORITHM)
             username, password = payload.get('username'), payload.get('password')
-            if username == movieconf.MOVIE_BASIC_AUTH['username'] and password == movieconf.MOVIE_BASIC_AUTH['password']:
+            if username == movieconf.MOVIE_BASIC_AUTH['username'] and \
+                            get_hash(password) == movieconf.MOVIE_BASIC_AUTH['password']:
                 return username, password
             raise JWTAuthException('Invalid JSONWebToken Credentials', 403)
         except IndexError:
