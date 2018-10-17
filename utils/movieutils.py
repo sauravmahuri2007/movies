@@ -9,6 +9,7 @@ import json
 
 from django.db import transaction
 from django.contrib.auth.models import User
+from django.utils.timezone import now
 
 from moviexceptions.generic import MovieAlreadyExists
 from movieapp.models import Movie, Person, Role, Genre
@@ -74,6 +75,52 @@ def add_movie(req_body):
                 genre_obj, is_created = get_or_create_genre(str(genre).strip())
                 movie.genres.add(genre_obj)
     return movie
+
+
+def search_movie(search_params):
+    """
+    Filter out the necessary fields as per Movie model in search_params and searches the movies in DB
+    :param search_params: a dictionary of Movie attributes
+    :return: List of dictionary
+    """
+    if not search_params or not isinstance(search_params, dict):
+        return []
+    qs = Movie.objects.filter(created_dtm__lte=now())  # initial query-set with all movies created before current date
+    for key, value in search_params.items():
+        key_lower = key.lower()
+        if key_lower in ('name', 'title'):
+            qs = qs.filter(title__icontains=value)
+        elif key_lower in ('imdb_score', 'rating'):
+            qs = qs.filter(rating__lte=value)
+        elif key_lower == 'director':
+            qs = qs.filter(director__name__iexact=value)
+        elif key_lower == 'release_date':
+            qs = qs.filter(release_date=value)
+        elif key_lower == 'genre':
+            if isinstance(value, list):
+                qs = qs.filter(genres__title__in=value)
+            elif isinstance(value, str):
+                qs = qs.filter(genres__title=value)
+    qs = qs.order_by('id')
+    result = [get_movie_response(movie) for movie in qs]
+    return result
+
+
+def get_movie_response(movie, **kwargs):
+    resp = {
+        'movie_id': movie.id,
+        'name': movie.title,
+        'imdb_score': float(movie.rating),
+        'director': movie.director.name,
+        'release_date': str(movie.release_date),
+        'run_time': movie.run_time,
+        'plot': movie.plot,
+        'genres': [genre.title for genre in movie.genres.all()],
+    }
+    casts = kwargs.get('casts')
+    if casts:
+        resp['casts'] = [{'name': cast.person_id.name, 'person_id': cast.person_id.id} for cast in casts]
+    return resp
 
 
 def get_request_body(request):

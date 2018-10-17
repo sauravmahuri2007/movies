@@ -9,7 +9,7 @@ from django.apps import AppConfig
 
 from .models import Movie, Cast
 from moviexceptions.generic import MovieAlreadyExists
-from utils.movieutils import get_or_create_genre, get_or_create_person
+from utils.movieutils import get_or_create_genre, get_or_create_person, get_movie_response
 
 class MovieappConfig(AppConfig):
     name = 'movieapp'
@@ -29,17 +29,7 @@ class MovieApp(object):
         Builds a dictionary having complete information about the movie, genres, casts etc.
         :return: a dictionary.
         """
-        resp = {
-            'movie_id': self.movie.id,
-            'name': self.movie.title,
-            'imdb_score': float(self.movie.rating),
-            'director': self.movie.director.name,
-            'release_date': str(self.movie.release_date),
-            'run_time': self.movie.run_time,
-            'plot': self.movie.plot,
-            'genres': [genre.title for genre in self.movie.genres.all()],
-            'casts': [{'name': cast.person_id.name, 'person_id': cast.person_id.id} for cast in self.casts],
-        }
+        resp = get_movie_response(self.movie, casts=self.casts)
         return resp
 
     def update(self, update_data):

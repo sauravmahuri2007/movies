@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
+from django.core.exceptions import ValidationError
+from django.utils.encoding import smart_str
 from django.db.models import ObjectDoesNotExist
 from django.http.response import JsonResponse
 from django.views.generic import View
 
 from .apps import MovieApp
-from utils.movieutils import add_movie, get_request_body
+from utils.movieutils import add_movie, get_request_body, search_movie
 from utils.auth import JWTAuthMixin, AllowGETMixin
 from utils.authorization import APIAuthorizationMixin
 from moviexceptions.generic import MovieAlreadyExists
@@ -28,8 +30,15 @@ class SearchAPI(View):
     """
 
     def get(self, request, *args, **kwargs):
-        #ToDo: Implement search by different fields
-        return JsonResponse('Not yet implemented!', status=200, safe=False)
+        search_params = get_request_body(request)
+        try:
+            result = search_movie(search_params) # returns a list of dictionary
+        except ValidationError as err:
+            return JsonResponse(smart_str(err), status=400, safe=False)
+        except Exception:
+            return JsonResponse({
+                'status': 500, 'error': 'Server Error! Something Went Slightly Wrong!!'}, status=500, safe=False)
+        return JsonResponse(result, status=200, safe=False)
 
 
 class MovieAPI(AllowGETMixin, JWTAuthMixin, APIAuthorizationMixin, View):
