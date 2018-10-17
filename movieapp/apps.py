@@ -63,6 +63,7 @@ class MovieApp(object):
             for genre in genres:
                 genre_obj, is_created = get_or_create_genre(str(genre).strip())
                 self.movie.genres.add(genre_obj)
+        self.movie.save()
 
 
 
