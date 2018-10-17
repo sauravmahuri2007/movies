@@ -29,6 +29,22 @@ URL_PERMISSIONS = {
     },
 }
 
+API_VALIDATION_RULES = {
+    'movie': {
+        'DELETE': {
+            'movieid': ['required', 'integer'], # Make sure there exists a staticmethod
+            # for given validation in Validators class. Check Validators class in utils.validation
+        },
+        'POST': {
+            'name': ['required', 'string'],
+            'director': ['required', 'string'],
+        },
+        'PATCH': {
+            'movieid': ['required', 'integer'],
+        },
+    }
+}
+
 JWT_EXPIRY_TIME = 60 * 60 * 24  # 24 Hours in seconds
 JWT_SECRET = 'T[-]IsSecretN3v3RExp0s^'
 JWT_ALGORITHM = 'HS256'

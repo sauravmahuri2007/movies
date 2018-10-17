@@ -10,6 +10,7 @@ from .apps import MovieApp
 from utils.movieutils import add_movie, get_request_body, search_movie
 from utils.auth import JWTAuthMixin, AllowGETMixin
 from utils.authorization import APIAuthorizationMixin
+from utils.validation import RequestValidationMixin
 from moviexceptions.generic import MovieAlreadyExists
 
 
@@ -41,7 +42,7 @@ class SearchAPI(View):
         return JsonResponse(result, status=200, safe=False)
 
 
-class MovieAPI(AllowGETMixin, JWTAuthMixin, APIAuthorizationMixin, View):
+class MovieAPI(AllowGETMixin, JWTAuthMixin, APIAuthorizationMixin, RequestValidationMixin, View):
     """
     RESTFul implementation of adding/editing/deleting/getting movies from the DB in JSON format.
     AllowGETMixin: Include this mixin when GET method doesn't require any kind of authentication.

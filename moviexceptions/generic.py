@@ -63,3 +63,21 @@ class APIAuthorizationException(Exception):
 
         def __str__(self):
             return '< %s - %s >' % (self.status_code, self.message)
+
+
+class RequestValidationException(Exception):
+    """
+    Raise this exception when the request doesn't contain a valid data or body.
+    This is how you'll raise this exception:
+    raise RequestValidationException('Request Validation Errors', 400)
+    """
+
+    def __init__(self, *details):
+        self.message = details and details[0] or 'Invalid Request Body'
+        try:
+            self.status_code = details and details[1] or 400
+        except IndexError:
+            self.status_code = 400
+
+        def __str__(self):
+            return '< %s - %s >' % (self.status_code, self.message)
