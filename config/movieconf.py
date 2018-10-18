@@ -39,7 +39,7 @@ API_VALIDATION_RULES = {
             'movieid': ['required', 'integer'],
         },
         'POST': {
-            'title': ['required', 'string'],
+            'name': ['required', 'string'],
             'director': ['required', 'string'],
         },
         'PATCH': {
