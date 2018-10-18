@@ -6,7 +6,7 @@ daemon After=network.target
 User=ubuntu
 Group=www-data
 WorkingDirectory=/home/ubuntu/movies
-ExecStart=/home/ubuntu/movies/venv/bin/gunicorn --access-logfile - --workers 3 --bind unix:/home/ubuntu/movies/movies.sock movies.wsgi:application
+ExecStart=/home/ubuntu/movies/venv/bin/gunicorn --access-logfile - --workers 3 --bind 0.0.0.0:8001 movies.wsgi:application
 
 [Install]
 WantedBy=multi-user.target
